@@ -16,7 +16,7 @@ jobs:
     permissions:
       contents: read
     outputs:
-      image_tag: ${{ steps.vars.outputs.tag }}
+      image_tag: ${{ steps.image-tag.outputs.tag }}
 
     steps:
       - name: Checkout code
@@ -58,21 +58,26 @@ jobs:
           fi
           echo "$DATE_TAG $COUNT" > "$COUNTER_FILE"
           TAG="${DATE_TAG}-${COUNT}"
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          #echo "TAG=$TAG" >> $GITHUB_ENV
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Image tag: $TAG"
 
-      - name: Container build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ vars.REGISTRY_HOSTNAME }}/dev/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+      # - name: Container build and push
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     file: Dockerfile
+      #     push: true
+      #     tags: ${{ vars.REGISTRY_HOSTNAME }}/dev/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+      - name: Output image tag using outputs
+        run: |
+          echo "Image tag output: ${{ steps.image-tag.outputs.tag }}"
 
       - name: Save counter to cache
         uses: actions/cache@v4
         with:
           path: .github/build_counter
           # Unique key for each build so it overwrites with new counter
-          key: build-counter-${{ env.TAG }}
+          #key: build-counter-${{ env.TAG }}
+          key: build-counter-${{ steps.image-tag.outputs.tag }}
