@@ -1,6 +1,23 @@
 name: Deploy Container Image to Application Server
 
 on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Image tag to deploy (leave empty for latest)"
+        required: false
+        type: string
+    secrets:
+      SERVER_HOST:
+        required: true
+      SERVER_USER:
+        required: true
+      SERVER_SSH_KEY:
+        required: true
+      # REGISTRY_USERNAME:
+      #   required: true
+      # REGISTRY_PASSWORD:
+      #   required: true
   workflow_dispatch:
     inputs:
       tag:
@@ -27,8 +44,8 @@ jobs:
 
       - name: Determine image tag
         run: |
-          if [ -n "${{ github.event.inputs.tag }}" ]; then
-            TAG="${{ github.event.inputs.tag }}"
+          if [ -n "${{ inputs.tag }}" ]; then
+            TAG="${{ inputs.tag }}"
           else
             if [ ! -f .github/build_counter ]; then
               echo "No build counter found" && exit 1
@@ -47,7 +64,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            #docker login ${{ vars.REGISTRY_HOSTNAME }} -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASSWORD }}
+            #docker login ${{ vars.REGISTRY_HOSTNAME }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
             docker pull ${{ vars.REGISTRY_HOSTNAME }}/dev/${{ env.IMAGE_NAME }}:${{ env.TAG }}
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true

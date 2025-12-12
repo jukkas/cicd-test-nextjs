@@ -76,3 +76,10 @@ jobs:
           path: .github/build_counter
           # Unique key for each build so it overwrites with new counter
           key: build-counter-${{ steps.image-tag.outputs.tag }}
+
+  deploy:
+    needs: build  # runs only after "build" completes
+    uses: ./.github/workflows/container-deploy.yml
+    with:
+      tag: ${{ needs.build.outputs.image_tag }}
+    secrets: inherit # pass all secrets
