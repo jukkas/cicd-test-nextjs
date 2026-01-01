@@ -2,9 +2,10 @@ name: Build & Push Container Image
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  # Uncomment the following lines to enable automatic builds on pushes to main branch
+  # push:
+  #   branches:
+  #     - main
 
 env:
   IMAGE_NAME: ${{ vars.APPLICATION_NAME }}
@@ -77,9 +78,10 @@ jobs:
           # Unique key for each build so it overwrites with new counter
           key: build-counter-${{ steps.image-tag.outputs.tag }}
 
-  deploy:
-    needs: build  # runs only after "build" completes
-    uses: ./.github/workflows/container-deploy.yml
-    with:
-      tag: ${{ needs.build.outputs.image_tag }}
-    secrets: inherit # pass all secrets
+  # Uncomment the following lines to enable deployment after build
+  # deploy:
+  #   needs: build  # runs only after "build" completes
+  #   uses: ./.github/workflows/container-deploy.yml
+  #   with:
+  #     tag: ${{ needs.build.outputs.image_tag }}
+  #   secrets: inherit # pass all secrets
