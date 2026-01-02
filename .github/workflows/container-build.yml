@@ -30,36 +30,13 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Restore counter from cache
-        id: cache-restore
-        uses: actions/cache@v4
-        with:
-          path: .github/build_counter
-          # This key will almost never match exactly — but restore-keys finds the most recent
-          key: build-counter-restore-${{ github.run_id }}
-          restore-keys: |
-            build-counter-
-
       - name: Generate image tag
         id: image-tag
         run: |
           mkdir -p .github
-          DATE_TAG=$(date +'%Y%m%d')
-          COUNTER_FILE=".github/build_counter"
-          if [ -f "$COUNTER_FILE" ]; then
-            LAST_DATE=$(cut -d' ' -f1 "$COUNTER_FILE")
-            LAST_COUNT=$(cut -d' ' -f2 "$COUNTER_FILE")
-            if [ "$LAST_DATE" = "$DATE_TAG" ]; then
-              COUNT=$((LAST_COUNT + 1))
-            else
-              COUNT=1
-            fi
-          else
-            COUNT=1
-          fi
-          echo "$DATE_TAG $COUNT" > "$COUNTER_FILE"
-          TAG="${DATE_TAG}-${COUNT}"
-          #echo "TAG=$TAG" >> $GITHUB_ENV
+          TAG="$(date +%Y%m%d%H%M%S)"
+          TAG_FILE=".github/build_tag"
+          echo "$TAG" > "$TAG_FILE"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Image tag: $TAG"
 
@@ -74,9 +51,9 @@ jobs:
       - name: Save counter to cache
         uses: actions/cache@v4
         with:
-          path: .github/build_counter
-          # Unique key for each build so it overwrites with new counter
-          key: build-counter-${{ steps.image-tag.outputs.tag }}
+          path: .github/build_tag
+          # Unique key for each build so it overwrites with new tag
+          key: build-tag-${{ steps.image-tag.outputs.tag }}
 
   # Uncomment the following lines to enable deployment after build
   # deploy:

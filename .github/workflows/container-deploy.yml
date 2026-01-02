@@ -34,25 +34,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Restore latest build counter
+      - name: Restore latest build tag from cache
         uses: actions/cache@v4
         with:
-          path: .github/build_counter
+          path: .github/build_tag
           key: deploy-restore-${{ github.run_id }}
           restore-keys: |
-            build-counter-
+            build-tag-
 
       - name: Determine image tag
         run: |
           if [ -n "${{ inputs.tag }}" ]; then
+            # Got tag from workflow input
             TAG="${{ inputs.tag }}"
           else
-            if [ ! -f .github/build_counter ]; then
-              echo "No build counter found" && exit 1
+            # Use tag from previous build stored in cache
+            if [ ! -f .github/build_tag ]; then
+              echo "No build tag found from cache" && exit 1
             fi
-            DATE_TAG=$(cut -d' ' -f1 .github/build_counter)
-            COUNT=$(cut -d' ' -f2 .github/build_counter)
-            TAG="${DATE_TAG}-${COUNT}"
+            TAG=$(cat .github/build_tag)
           fi
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "Deploying image tag: $TAG"
@@ -74,4 +74,5 @@ jobs:
               -p ${{ env.CONTAINER_PORT_MAPPING }} \
               -u $(id -u):$(id -g) \
               --env-file /deploy/${{ vars.APPLICATION_NAME }}/application.env \
+              --env-file /deploy/${{ vars.APPLICATION_NAME }}/override.env \
               ${{ vars.REGISTRY_HOSTNAME }}/dev/${{ env.IMAGE_NAME }}:${{ env.TAG }}
