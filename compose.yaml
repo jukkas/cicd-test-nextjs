@@ -1,0 +1,10 @@
+# This for testing container image locally
+services:
+  web:
+    image: cicd-test-nextjs:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api.example.com
+      - NEXT_PUBLIC_JUKKAS_TEST_KEY=ThisIsSetAtComposeYaml
+      - NEXT_PUBLIC_MISSING_KEY=ThisIsAlsoSetAtComposeYaml

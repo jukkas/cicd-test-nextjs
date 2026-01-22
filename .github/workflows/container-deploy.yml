@@ -112,7 +112,6 @@ jobs:
               --name ${{ env.CONTAINER_NAME }} \
               --restart unless-stopped \
               -p ${{ env.CONTAINER_PORT_MAPPING }} \
-              -u $(id -u):$(id -g) \
               --env-file /deploy/${{ vars.APPLICATION_NAME }}/application.env \
               --env-file /deploy/${{ vars.APPLICATION_NAME }}/production.env \
               --env-file /deploy/${{ vars.APPLICATION_NAME }}/override.env \

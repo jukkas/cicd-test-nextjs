@@ -39,6 +39,7 @@ export default function RootLayout({
                 Environment
               </a>
             </li>
+            <li><a href="/test" className="text-blue-500 hover:underline">PublicEnvTest</a></li>
           </ul>
         </nav>
         {children}
