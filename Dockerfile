@@ -2,10 +2,12 @@
 
 FROM node:20-alpine AS base
 
+ARG NEXT_PUBLIC_FROM_CICD
 # Set placeholders for all dynamic public variables
 ENV NEXT_PUBLIC_API_URL=APP_NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_JUKKAS_TEST_KEY=APP_NEXT_PUBLIC_JUKKAS_TEST_KEY
 ENV NEXT_PUBLIC_MISSING_KEY=ThisIsSetAtDockerfile
+ENV NEXT_PUBLIC_FROM_CICD=$NEXT_PUBLIC_FROM_CICD
 
 # Install dependencies only when needed
 FROM base AS deps

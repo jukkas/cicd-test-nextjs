@@ -10,6 +10,8 @@ on:
 env:
   IMAGE_NAME: ${{ vars.APPLICATION_NAME }}
   CONTAINER_NAME: ${{ vars.APPLICATION_NAME }}
+  NEXT_PUBLIC_FROM_CICD: FromGithubActionsWorkflow
+  # or better: NEXT_PUBLIC_FROM_CICD: ${{ vars.NEXT_PUBLIC_FROM_CICD }}
 
 jobs:
   build:
@@ -45,8 +47,11 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          build-args: |
+            NEXT_PUBLIC_FROM_CICD=${{ env.NEXT_PUBLIC_FROM_CICD }}
           push: true
           tags: ${{ vars.REGISTRY_HOSTNAME }}/dev/${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }}
+
 
       - name: Save counter to cache
         uses: actions/cache@v4
